@@ -32,7 +32,7 @@ def get_link():
     global downloadURLs
     downloadURLs = []
     
-    # リンク取得先のWebサイトにリクエストを送信し、PDFのリンクURLを取得する
+    # リンク取得先のWebにリクエストを送信し、PDFのリンクURLを取得する
     for url in urls:
         
         r = requests.get(url)
