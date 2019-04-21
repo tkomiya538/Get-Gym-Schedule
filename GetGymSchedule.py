@@ -32,7 +32,7 @@ def get_link():
     global downloadURLs
     downloadURLs = []
     
-    # リンク取得先のWebにリクエストを送信し、PDFのリンクURLを取得する
+    # リンク取得先のWebサイトにリクエストを送信し、PDFのリンクURLを取得する
     for url in urls:
         
         r = requests.get(url)
@@ -88,35 +88,6 @@ def css(filename):
 
 # Webページを作成する    
 if __name__ == '__main__':
-    run(host="localhost", port=1042, debug=True, reloder=True)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+    #run(host="localhost", port=1042, debug=True, reloder=True)
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
