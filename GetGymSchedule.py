@@ -23,6 +23,7 @@ urls = [
     "https://www.koto-hsc.or.jp/sports_center3/schedule/",
         ]
 TEMPLATE_PATH.extend(['./views','./css','./images','./js'])
+notFound = "notFound.html"
 
 # htmlテンプレートに渡すリンク先URLを取得
 @route('/')
@@ -31,10 +32,10 @@ def get_link():
     output=[]
     global downloadURLs
     downloadURLs = []
-    
+
     # リンク取得先のWebサイトにリクエストを送信し、PDFのリンクURLを取得する
     for url in urls:
-        
+
         r = requests.get(url)
         soup = BeautifulSoup(r.content)
         links = soup.findAll('a')
@@ -50,25 +51,32 @@ def get_link():
                 if href and extension and keyword in (href + title):
                     downloadURLs.append(href)
 
+        #リンク取得先が一つの場合、配列要素を一つ追加
+        if len(downloadURLs) % 2 != 0:
+            downloadURLs.append(notFound)
+
     # PDFのリンクとなるURLを補完・取得
     for downloadURL in downloadURLs:
 
         # 一秒スリープ
         time.sleep(1)
 
-        for baseURL in baseURLs:
-            if baseURL in downloadURL:
-                linkURL = downloadURL
-            else:
-                linkURL = baseURL + downloadURL
+        if downloadURL != notFound:        
+            for baseURL in baseURLs:
+                if baseURL in downloadURL:
+                    linkURL = downloadURL
+                else:
+                    linkURL = baseURL + downloadURL
 
-            r = requests.get(linkURL)
+                r = requests.get(linkURL)
 
-            # 接続確認
-            if r.status_code == 200:
-                output.append(linkURL)
-    
-    #アウトプットとなる関数を定義
+                # 接続確認
+                if r.status_code == 200 and linkURL not in (baseURL):
+                    output.append(linkURL)
+        else:
+            output.append(downloadURL)
+
+    # アウトプットとなる関数を定義
     for i in range(4):
         globals()["output%d" % i] = ""
 
@@ -77,11 +85,16 @@ def get_link():
     for link in output:
         globals()["output%d" % j ] = link
         j += 1
-    
+
     # htmlテンプレートにリンク先URLを渡す
     return template('index', output0 = output0, output1 = output1, output2 = output2, output3 = output3)
 
-#cssファイルをインポート
+@route('/' + notFound)
+def title():
+    # views/notFound.htmlを呼ぶ
+    return template(notFound)
+
+# cssファイルをインポート
 @get('/static/css/<filename:re:.*.css>')
 def css(filename):
     return static_file(filename, root="static/css")
@@ -90,4 +103,16 @@ def css(filename):
 if __name__ == '__main__':
     #run(host="localhost", port=1042, debug=True, reloder=True)
     run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
